@@ -1,0 +1,405 @@
+/* --- สไตล์พื้นฐานและฟอนต์ --- */
+body {
+  margin: 0;
+  /* นี่คือจุดที่เราเรียกใช้ฟอนต์ที่เพิ่งเพิ่มเข้ามา */
+  font-family: 'Sriracha', sans-serif; 
+  background-color: #121212; /* สีดำเผื่อกรณีรูปไม่โหลด */
+  background-image: url('https://res.cloudinary.com/dkrwuxjec/image/upload/v1760603561/333877546_3370710409852671_6757044834152204563_n_quqibz.jpg');
+  background-size: cover; /* ทำให้รูปภาพเต็มพื้นที่จอ */
+  background-position: center center; /* จัดรูปภาพให้อยู่กึ่งกลาง */
+  background-attachment: fixed; /* ทำให้พื้นหลังไม่เลื่อนตาม content */
+  
+  color: #e0e0e0; /* สีตัวอักษรหลัก (สีขาวนวล) */
+}
+.sriracha-regular {
+  font-family: "Sriracha", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* --- Layout หลักของแอป --- */
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  width: 100%;
+}
+
+/* --- ส่วนหัวและช่องค้นหา --- */
+.filter-wrapper {
+  flex: 0 0 250px;
+  background-color: #ffffff;
+  border-right: 1px solid #dee2e6;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 0;
+}
+
+.filter-wrapper.hidden {
+  margin-left: -250px;
+}
+
+/* --- คอลัมน์ที่ 2: Card Gallery --- */
+.card-gallery-wrapper {
+  flex: 1; /* --- REVISED: เปลี่ยนเป็น 1 เพื่อให้ขยายเต็มที่ --- */
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- REVISED: คอลัมน์ที่ 3: Deck List (ลดความกว้าง + เพิ่ม Transition) --- */
+.deck-list-wrapper {
+  flex: 0 0 350px; /* --- REVISED: กำหนดความกว้างคงที่ 350px --- */
+  background-color: #ffffff;
+  padding: 24px;
+  border-left: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative; /* --- NEW: เพื่อให้ปุ่ม toggle อยู่ในกรอบ --- */
+  transition: margin-right 0.3s ease-in-out; /* --- NEW: Animation การเลื่อน --- */
+  margin-right: 0;
+}
+
+/* --- NEW: สถานะ "ซ่อน" ของ Deck List --- */
+.deck-list-wrapper.hidden {
+  margin-right: -350px; /* เลื่อนไปทางขวาเท่ากับความกว้างของตัวเอง */
+}
+
+
+/* --- ส่วนหัวและช่องค้นหา --- */
+.app-header {
+  background-color: #ffffff;
+  padding: 16px 24px;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
+  position: relative;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #212529;
+}
+
+.search-bar {
+  width: 95%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-top: 16px;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* --- ปุ่มเปิด/ปิด Filter --- */
+.filter-toggle-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background-color 0.2s;
+}
+
+.filter-toggle-btn:hover {
+  background-color: #0056b3;
+}
+
+/* --- NEW: สไตล์สำหรับปุ่มเปิด/ปิด Deck List --- */
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  /* เพิ่มพื้นหลังโปร่งแสงเล็กน้อยเพื่อให้ตัวอักษรอ่านง่ายขึ้น */
+  background-color: rgba(18, 18, 18, 0.7); 
+}
+
+.main-content {
+  display: flex;
+  width: 100%;
+}
+
+/* --- คอลัมน์ที่ 1: Filter Wrapper --- */
+.filter-wrapper {
+  flex: 0 0 250px;
+  background-color: #1e1e1e; /* สีเทาเข้ม */
+  border-right: 1px solid #333;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 0;
+}
+
+.filter-wrapper.hidden {
+  margin-left: -250px;
+}
+
+/* --- คอลัมน์ที่ 2: Card Gallery --- */
+.card-gallery-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  background-color: transparent; /* ทำให้โปร่งใส เห็นพื้นหลัง */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- คอลัมน์ที่ 3: Deck List --- */
+.deck-list-wrapper {
+  flex: 0 0 350px;
+  background-color: #1e1e1e; /* สีเทาเข้ม */
+  padding: 24px;
+  border-left: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+  transition: margin-right 0.3s ease-in-out;
+  margin-right: 0;
+}
+
+.deck-list-wrapper.hidden {
+  margin-right: -350px;
+}
+
+/* --- ส่วนหัวและช่องค้นหา --- */
+.app-header {
+  background-color: rgba(30, 30, 30, 0.8); /* สีเทาเข้มโปร่งแสง */
+  backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์กระจกฝ้า */
+  padding: 16px 24px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+  position: relative;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #ffffff; /* สีขาว */
+}
+
+.search-bar {
+  width: 95%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: #333;
+  color: #e0e0e0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-top: 16px;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+.search-bar::placeholder {
+  color: #888;
+}
+
+/* --- ปุ่ม Toggle --- */
+.filter-toggle-btn, .decklist-toggle-btn {
+  /* ... โค้ดเดิม ... */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* (โค้ดส่วนที่เหลือจะถูกปรับสีให้เข้ากับ Dark Mode) */
+.filter-toggle-btn {
+  position: absolute; top: 16px; left: -3px; background-color: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 101; transition: background-color 0.2s;
+}
+.filter-toggle-btn:hover { background-color: #0056b3; }
+.decklist-toggle-btn {
+  position: absolute; bottom: 16px; left: 16px; background-color: #28a745; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 101; transition: background-color 0.2s;
+}
+.decklist-toggle-btn:hover { background-color: #218838; }
+
+/* --- Filter Panel --- */
+.filter-main-title {
+  font-size: 1.5rem;
+  margin: 0 0 16px 0;
+  color: #007bff;
+}
+.filter-panel { display: flex; flex-direction: column; gap: 20px; }
+.filter-group { display: flex; flex-direction: column; }
+.filter-title {
+  font-size: 1rem; font-weight: 700; margin: 0 0 8px 0; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 4px;
+}
+.filter-options { display: flex; flex-direction: column; gap: 8px; }
+.filter-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; }
+.filter-label input[type="checkbox"] { cursor: pointer; }
+
+/* --- คลังการ์ด --- */
+.card-gallery { padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; flex-grow: 1; }
+.card-container { width: 100%; cursor: pointer; }
+.card-image {
+  width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; display: block;
+}
+.card-image:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+
+/* --- Deck List & Card Items --- */
+.deck-actions { margin-bottom: 20px; display: flex; }
+.clear-deck-btn {
+  flex-grow: 1; padding: 10px 15px; font-size: 1rem; font-weight: 700; color: #ff4d4d; background-color: rgba(220, 53, 69, 0.2); border: 1px solid #dc3545; border-radius: 8px; cursor: pointer; transition: background-color 0.2s, color 0.2s;
+}
+.clear-deck-btn:hover { background-color: #dc3545; color: white; }
+.deck-section { margin-bottom: 24px; }
+.deck-header {
+  font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #007bff; color: #007bff;
+}
+.deck-card-list { display: flex; flex-direction: column; gap: 8px; }
+.deck-card-item {
+  display: flex; align-items: center; background-color: #2a2a2a; padding: 8px 12px; border-radius: 6px; border-left: 4px solid #6c757d; user-select: none; transition: background-color 0.2s, border-color 0.2s; justify-content: space-between;
+}
+.deck-card-item:hover { background-color: #3a3a3a; border-color: #007bff; }
+.deck-card-thumbnail {
+  width: 30px; height: 30px; border-radius: 4px; object-fit: cover; margin-right: 10px; border: 1px solid #444;
+}
+.deck-card-count {
+  min-width: 30px; text-align: left; margin-right: 8px; font-weight: 700; color: #ccc; font-size: 1rem;
+}
+.deck-card-name { flex-grow: 1; font-size: 0.95rem; }
+.delete-card-btn {
+  background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888; padding: 0 5px; opacity: 0.5; transition: opacity 0.2s, transform 0.2s;
+}
+.deck-card-item:hover .delete-card-btn { opacity: 1; }
+.delete-card-btn:hover { color: #dc3545; transform: scale(1.2); }
+.deck-card-group { margin-bottom: 1rem; }
+.group-header {
+  font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #aaa; margin: 0 0 0.5rem 0; padding-left: 0.25rem;
+}
+.deck-list-printable-area {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* ทำให้ขยายเต็มพื้นที่ที่เหลือ */
+}
+
+.deck-name-input {
+  width: 95%;
+  padding: 10px 12px;
+  font-size: 1.1rem;
+  font-family: 'Kanit', sans-serif;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: #333;
+  color: #e0e0e0;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.deck-name-input::placeholder {
+  color: #888;
+}
+
+.deck-actions {
+  /* แก้ไขของเดิมให้รองรับ 2 ปุ่ม */
+  gap: 10px;
+}
+
+.export-image-btn {
+  flex: 1;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background-color: #007bff;
+  border: 1px solid #0069d9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.export-image-btn:hover { background-color: #0069d9; }
+
+.deck-section { margin-bottom: 24px; display: flex; flex-direction: column; }
+.deck-header { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #007bff; color: #007bff; }
+.deck-card-list { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+.deck-card-item { display: flex; align-items: center; background-color: #2a2a2a; padding: 8px 12px; border-radius: 6px; border-left: 4px solid #6c757d; user-select: none; transition: background-color 0.2s, border-color 0.2s; justify-content: space-between; }
+.deck-card-item:hover { background-color: #3a3a3a; border-color: #007bff; }
+.deck-card-thumbnail { width: 30px; height: 30px; border-radius: 4px; object-fit: cover; margin-right: 10px; border: 1px solid #444; }
+.deck-card-count { min-width: 30px; text-align: left; margin-right: 8px; font-weight: 700; color: #ccc; font-size: 1rem; }
+.deck-card-name { flex-grow: 1; font-size: 0.95rem; }
+.delete-card-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888; padding: 0 5px; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; }
+.deck-card-item:hover .delete-card-btn { opacity: 1; }
+.delete-card-btn:hover { color: #dc3545; transform: scale(1.2); }
+.deck-card-group { margin-bottom: 1rem; }
+.group-header { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #aaa; margin: 0 0 0.5rem 0; padding-left: 0.25rem; }
+
+/* --- สไตล์สำหรับส่วนที่จะ Export เป็นรูปภาพ --- */
+.printable-area-container {
+  position: absolute; left: -9999px; top: auto; width: 1200px; padding: 20px; background-color: #1e1e1e; color: #e0e0e0;
+}
+.printable-header {
+  text-align: center; margin-bottom: 20px; border-bottom: 2px solid #007bff;
+}
+.printable-header h2 {
+  margin: 0 0 10px 0; font-size: 2.5rem;
+}
+.printable-content-grid {
+  display: flex; flex-direction: row; gap: 20px; align-items: flex-start;
+}
+.printable-group-column {
+  display: flex; flex-direction: column; gap: 1.5rem; min-width: 280px;
+}
+.printable-area-container .deck-card-item {
+  padding: 10px 12px;
+}
+.printable-area-container .deck-card-thumbnail {
+  width: 40px; height: 40px;
+}
+.printable-area-container .deck-card-name {
+  font-size: 1rem;
+}
+.export-pdf-btn {
+  flex-grow: 1;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background-color: #6f42c1; /* สีม่วง */
+  border: 1px solid #5a32a3;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.export-pdf-btn:hover {
+  background-color: #5a32a3;
+}
+
+/* ปรับแก้ deck-actions เล็กน้อย */
+.deck-actions {
+  margin-bottom: 10px; /* ลดระยะห่างเล็กน้อย */
+}
+.export-pdf-btn:disabled {
+  background-color: #555;
+  border-color: #444;
+  color: #888;
+  cursor: not-allowed;
+}
