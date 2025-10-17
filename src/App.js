@@ -104,13 +104,19 @@ function App() {
       });
   }, [cards, searchTerm, filters]);
 
-
-  const addCardToDeck = (cardToAdd) => {
-    const isLifeCard = cardToAdd.Name.includes('_Life') || cardToAdd.RuleName.includes('_Life');
+const handleCardClick = (card) => {
+    const isLifeCard = card.Name.includes('_Life') || card.RuleName.includes('_Life');
+    
+    // ถ้าเป็นการ์ด Life ให้ส่งไปที่ Life Deck เลย
     if (isLifeCard) {
-      alert("การ์ดประเภท Life สามารถเพิ่มลงใน Life Deck ได้เท่านั้น (โดยการคลิกขวา)");
-      return;
+      addCardToLifeDeck(card);
+    } else {
+      // ถ้าไม่ใช่ ก็ส่งไปที่ Main Deck ตามปกติ
+      addCardToDeck(card);
     }
+  };
+  const addCardToDeck = (cardToAdd) => {
+
     const MEAR_PRA_ISUAN_RULENAME = 'เมียพระอิศวร';
     const THEP_SYMBOL = 'เทพ';
     const AVATAR_TYPE = 'Avatar';
@@ -372,7 +378,7 @@ function App() {
           <main className="card-gallery">
             {loading ? <p>Loading cards...</p> : (
               filteredCards.map((card, index) => (
-                <div key={`${card.RuleName}-${index}`} className="card-container" onClick={() => addCardToDeck(card)} onContextMenu={(e) => { e.preventDefault(); addCardToLifeDeck(card); }}>
+                <div key={`${card.RuleName}-${index}`} className="card-container" onClick={() => handleCardClick(card)} onContextMenu={(e) => { e.preventDefault(); addCardToLifeDeck(card); }}>
                   <img src={card.image_url} alt={card.Name} className="card-image" />
                 </div>
               ))
