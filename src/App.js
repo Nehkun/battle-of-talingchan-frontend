@@ -35,7 +35,7 @@ function App() {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/cards');
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/cards`);
         const cleanedData = response.data.data.map(card => ({
           ...card,
           AllowedCopies: card.AllowedCopies === '' ? null : Number(card.AllowedCopies)
