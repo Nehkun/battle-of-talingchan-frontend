@@ -19,7 +19,6 @@ function App() {
   const [isDeckListVisible, setIsDeckListVisible] = useState(true);
 
   const [deckName, setDeckName] = useState('');
-  // --- NEW: State สำหรับชื่อผู้เล่น ---
   const [playerName, setPlayerName] = useState('');
   
   const deckListRef = useRef(null);
@@ -36,7 +35,7 @@ function App() {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/cards`);
+        const response = await axios.get('http://127.0.0.1:8000/api/cards');
         const cleanedData = response.data.data.map(card => ({
           ...card,
           AllowedCopies: card.AllowedCopies === '' ? null : Number(card.AllowedCopies)
@@ -51,31 +50,42 @@ function App() {
     fetchCards();
   }, []);
   
+  // --- REVISED: สร้าง Options สำหรับ Filter (เวอร์ชันแก้บัค) ---
   const filterOptions = useMemo(() => {
-    const options = {
-      Type: new Set(),
-      Symbol: new Set(),
-      Cost: new Set(),
-      'C Color': new Set(),
-      Gem: new Set(),
-      'G Color': new Set(),
-    };
+    // กำหนดหมวดหมู่ที่เราสนใจชัดเจน
+    const categories = ['Type', 'Symbol', 'Cost', 'C Color', 'Gem', 'G Color'];
+    const options = {};
+
+    // สร้าง Set ว่างสำหรับแต่ละหมวดหมู่
+    categories.forEach(category => {
+      options[category] = new Set();
+    });
+
+    // วนลูปการ์ดทุกใบเพื่อเติมค่าลงใน Set ที่ถูกต้อง
     cards.forEach(card => {
-      Object.keys(options).forEach(key => {
-        if (card[key] !== '' && card[key] !== undefined) {
-          options[key].add(card[key]);
+      categories.forEach(category => {
+        const value = card[category];
+        if (value !== '' && value !== undefined && value !== null) {
+          // ทำความสะอาดข้อมูล: แปลงเป็น String, ตัดเว้นวรรคหน้า-หลัง
+          const cleanedValue = value.toString().trim();
+          if (cleanedValue) {
+            options[category].add(cleanedValue);
+          }
         }
       });
     });
+    
+    // แปลง Set เป็น Array และเรียงข้อมูล
     return {
       Type: Array.from(options.Type).sort(),
       Symbol: Array.from(options.Symbol).sort(),
-      Cost: Array.from(options.Cost).sort((a, b) => a - b),
+      Cost: Array.from(options.Cost).sort((a, b) => Number(a) - Number(b)),
       'C Color': Array.from(options['C Color']).sort(),
-      Gem: Array.from(options.Gem).sort((a, b) => a - b),
+      Gem: Array.from(options.Gem).sort((a, b) => Number(a) - Number(b)),
       'G Color': Array.from(options['G Color']).sort(),
     };
   }, [cards]);
+
 
   const handleFilterChange = (category, value) => {
     setFilters(prevFilters => {
@@ -99,24 +109,20 @@ function App() {
           if (values.length === 0) {
             return true;
           }
-          return values.includes(card[category]);
+          // ตรวจสอบค่าที่ถูกทำความสะอาดแล้ว
+          const cardValue = card[category]?.toString().trim();
+          return values.includes(cardValue);
         });
       });
   }, [cards, searchTerm, filters]);
 
-const handleCardClick = (card) => {
-    const isLifeCard = card.Name.includes('_Life') || card.RuleName.includes('_Life');
-    
-    // ถ้าเป็นการ์ด Life ให้ส่งไปที่ Life Deck เลย
-    if (isLifeCard) {
-      addCardToLifeDeck(card);
-    } else {
-      // ถ้าไม่ใช่ ก็ส่งไปที่ Main Deck ตามปกติ
-      addCardToDeck(card);
-    }
-  };
-  const addCardToDeck = (cardToAdd) => {
 
+  const addCardToDeck = (cardToAdd) => {
+    const isLifeCard = cardToAdd.Name.includes('_Life') || cardToAdd.RuleName.includes('_Life');
+    if (isLifeCard) {
+      alert("การ์ดประเภท Life สามารถเพิ่มลงใน Life Deck ได้เท่านั้น (โดยการคลิกขวา)");
+      return;
+    }
     const MEAR_PRA_ISUAN_RULENAME = 'เมียพระอิศวร';
     const THEP_SYMBOL = 'เทพ';
     const AVATAR_TYPE = 'Avatar';
@@ -257,7 +263,6 @@ const handleCardClick = (card) => {
     });
   };
 
-  // --- NEW: ฟังก์ชันสำหรับ Export PDF งานแข่ง ---
   const handleExportTournamentPDF = async () => {
     if (deckName.trim() === '' || playerName.trim() === '') {
       alert('กรุณากรอกชื่อเด็คและชื่อผู้เล่นก่อน Export PDF');
@@ -280,7 +285,7 @@ const handleCardClick = (card) => {
         responseType: 'blob',
       });
       
-      const file = new Blob([response.data], { type: 'application/pdf' });
+      const file = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const fileURL = URL.createObjectURL(file);
       
       const link = document.createElement('a');
@@ -378,7 +383,7 @@ const handleCardClick = (card) => {
           <main className="card-gallery">
             {loading ? <p>Loading cards...</p> : (
               filteredCards.map((card, index) => (
-                <div key={`${card.RuleName}-${index}`} className="card-container" onClick={() => handleCardClick(card)} onContextMenu={(e) => { e.preventDefault(); addCardToLifeDeck(card); }}>
+                <div key={`${card.RuleName}-${index}`} className="card-container" onClick={() => addCardToDeck(card)} onContextMenu={(e) => { e.preventDefault(); addCardToLifeDeck(card); }}>
                   <img src={card.image_url} alt={card.Name} className="card-image" />
                 </div>
               ))
@@ -393,9 +398,8 @@ const handleCardClick = (card) => {
           
           <div className="deck-list-content">
             <input type="text" className="deck-name-input" placeholder="กรอกชื่อเด็ค..." value={deckName} onChange={(e) => setDeckName(e.target.value)} />
-            {/* --- NEW: Input สำหรับชื่อผู้เล่น --- */}
             <input type="text" className="deck-name-input" placeholder="กรอกชื่อผู้เล่น..." value={playerName} onChange={(e) => setPlayerName(e.target.value)} />
-
+            
             <div className="deck-actions">
               <button onClick={clearAllDecks} className="clear-deck-btn">
                 Clear All 🗑️
@@ -404,12 +408,9 @@ const handleCardClick = (card) => {
                 Export Image 📸
               </button>
             </div>
-
-            {/* --- NEW: ปุ่ม Export PDF --- */}
+            
             <div className="deck-actions">
-              <button onClick={handleExportTournamentPDF} className="export-pdf-btn" disabled>
-                Export PDF for Tournament 📜
-              </button>
+                <button onClick={handleExportTournamentPDF} className="export-pdf-btn">Export for Tournament 📜</button>
             </div>
             
             <div className="deck-section">
