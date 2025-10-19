@@ -173,11 +173,27 @@ body {
   /* Adjust main content area */
   .card-gallery-wrapper { padding-top: 50px; /* Reduced space for fixed header */ }
   .app-header {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 150; padding: 8px 12px; /* Adjust padding */
+    position: fixed; top: 0; left: 0; right: 0; z-index: 150;
+    padding: 8px 12px; /* Keep padding */
+    display: flex; /* Use flexbox */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
   }
-  .header-buttons { top: 12px; left: 10px; right: 10px; transform: none; } /* Adjust button container positioning */
+  .header-buttons {
+    position: static; /* Remove absolute positioning */
+    transform: none;  /* Remove transform */
+    width: 100%;      /* Take full width */
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px; /* Add space below buttons */
+    pointer-events: auto; /* Ensure buttons are clickable */
+  }
   .toggle-button { padding: 4px 8px; font-size: 0.8rem; }
-  .app-header h1 { font-size: 1.1rem; margin-top: 40px; } /* Push title below buttons */
+  .app-header h1 {
+    font-size: 1.1rem;
+    margin-top: 0; /* Remove top margin */
+    margin-bottom: 8px; /* Adjust margin if needed */
+  }
   .search-bar { width: 85%; margin-top: 8px; padding: 6px 8px; font-size: 0.8rem;}
 
   .close-sidebar-btn { top: 8px; right: 8px; font-size: 1.8rem;}
