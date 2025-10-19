@@ -16,7 +16,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [isDeckListVisible, setIsDeckListVisible] = useState(false);
+  const [isDeckListVisible, setIsDeckListVisible] = useState(true);
 
   const [deckName, setDeckName] = useState('');
   const [playerName, setPlayerName] = useState('');
