@@ -107,11 +107,13 @@ body {
   position: fixed;
   top: 10px;
   left: 10px;
-  background-color: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 201; box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background-color 0.2s;
+  background-color: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  z-index: 202; /* INCREASED Z-INDEX */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background-color 0.2s;
 }
 .filter-toggle-btn:hover { background-color: #0056b3; }
 
-/* --- REVISED: Deck List Toggle Button --- */
+/* --- Deck List Toggle Button (Desktop) --- */
 .decklist-toggle-btn {
   position: absolute; /* Position relative to deck-list-wrapper */
   top: 16px;          /* Distance from top edge of sidebar */
@@ -212,11 +214,33 @@ body {
   .app-header h1 { font-size: 1.3rem; margin-bottom: 8px;} /* Adjust title */
   .search-bar { width: 90%; margin-top: 8px; padding: 8px 10px; font-size: 0.9rem;}
 
-  /* Adjust toggle button positions slightly */
+  /* Adjust toggle button positions */
   .filter-toggle-btn { /* Filter button remains fixed */
       position: fixed;
       top: 12px;
       left: 12px;
+  }
+  /* --- REVISED: Deck List Button Fixed on Mobile --- */
+  .decklist-toggle-btn {
+      position: fixed; /* Ensure it stays on screen */
+      top: 12px;
+      right: 12px; /* Position to the top-right */
+      left: auto;   /* Remove absolute positioning relative to sidebar */
+      /* Keep visual styles */
+       background-color: #28a745;
+       color: white;
+       border: 2px solid red; /* Keep red border if desired */
+       border-radius: 50%;
+       width: 40px;
+       height: 40px;
+       font-size: 1.5rem;
+       cursor: pointer;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       z-index: 202; /* Ensure it's on top */
+       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+       transition: background-color 0.2s;
   }
 
   /* Smaller cards on mobile */
