@@ -64,7 +64,7 @@ body {
 .app-header {
   background-color: rgba(30, 30, 30, 0.8); backdrop-filter: blur(5px); padding: 10px 16px; /* Reduced padding */ text-align: center; border-bottom: 1px solid #333; position: relative; z-index: 150; /* Ensure header is above gallery but below popups */
 }
-/* --- Header Button Container --- */
+/* --- Header Button Container (Desktop) --- */
 .header-buttons {
   position: absolute; /* Position buttons within header */
   top: 50%;
@@ -171,7 +171,7 @@ body {
   .deck-list-wrapper.visible { transform: translateX(0); }
 
   /* Adjust main content area */
-  .card-gallery-wrapper { padding-top: 50px; /* Reduced space for fixed header */ }
+  .card-gallery-wrapper { padding-top: 80px; /* --- INCREASED PADDING TOP --- */ }
 
   /* --- REVISED: Mobile Header Layout --- */
   .app-header {
@@ -180,6 +180,7 @@ body {
     display: flex; /* Use flexbox */
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
+    /* --- REMOVED fixed height --- */
   }
   .header-buttons {
     position: static; /* Remove absolute positioning */
@@ -188,6 +189,7 @@ body {
     display: flex;
     justify-content: space-between;
     margin-bottom: 8px; /* Add space below buttons */
+    order: 1; /* --- NEW: Make buttons appear first --- */
     pointer-events: auto; /* Ensure buttons are clickable */
   }
   .toggle-button { padding: 4px 8px; font-size: 0.8rem; }
@@ -195,8 +197,15 @@ body {
     font-size: 1.1rem;
     margin-top: 0; /* Remove top margin */
     margin-bottom: 8px; /* Adjust margin if needed */
+    order: 2; /* --- NEW: Make title appear second --- */
   }
-  .search-bar { width: 85%; margin-top: 8px; padding: 6px 8px; font-size: 0.8rem;}
+  .search-bar {
+    width: 85%;
+    margin-top: 0; /* Remove top margin */
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    order: 3; /* --- NEW: Make search bar appear last --- */
+  }
   /* --- End Revision --- */
 
   .close-sidebar-btn { top: 8px; right: 8px; font-size: 1.8rem;}
