@@ -111,9 +111,26 @@ body {
 .filter-toggle-btn { left: 10px; } /* Position filter button */
 .filter-toggle-btn:hover { background-color: #0056b3; }
 .decklist-toggle-btn {
-  right: 10px; /* Position decklist button on the right */
-  left: auto; /* Remove conflicting left property */
+  position: absolute; /* เปลี่ยนกลับเป็น absolute */
+  top: 16px;
+  /* --- REVISED: ย้ายปุ่มมาติดขอบซ้ายของ Sidebar --- */
+  left: -20px; /* ทำให้ปุ่มยื่นออกมาทางซ้ายจากขอบของ Sidebar */
+  right: auto; /* ลบการกำหนดตำแหน่งชิดขวา */
+  /* --- End Revision --- */
   background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101; /* ปรับ z-index ตามความเหมาะสม */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background-color 0.2s;
 }
 .decklist-toggle-btn:hover { background-color: #218838; }
 
