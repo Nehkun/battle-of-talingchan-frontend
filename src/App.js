@@ -14,13 +14,13 @@ function App() {
   const [mainDeck, setMainDeck] = useState([]);
   const [lifeDeck, setLifeDeck] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isDeckListVisible, setIsDeckListVisible] = useState(true);
 
   const [deckName, setDeckName] = useState('');
   const [playerName, setPlayerName] = useState('');
-  
+
   const deckListRef = useRef(null);
 
   const [filters, setFilters] = useState({
@@ -35,7 +35,9 @@ function App() {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/cards`);
+        // ใช้ Environment Variable หรือ URL เริ่มต้น
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
+        const response = await axios.get(`${apiUrl}/api/cards`);
         const cleanedData = response.data.data.map(card => ({
           ...card,
           AllowedCopies: card.AllowedCopies === '' ? null : Number(card.AllowedCopies)
@@ -49,32 +51,38 @@ function App() {
     };
     fetchCards();
   }, []);
-  
-  // --- REVISED: สร้าง Options สำหรับ Filter (เวอร์ชันแก้บัค) ---
+
+  // --- REVISED: สร้าง Options สำหรับ Filter (เวอร์ชันแก้บัค Cost/Gem) ---
   const filterOptions = useMemo(() => {
-    // กำหนดหมวดหมู่ที่เราสนใจชัดเจน
     const categories = ['Type', 'Symbol', 'Cost', 'C Color', 'Gem', 'G Color'];
     const options = {};
 
-    // สร้าง Set ว่างสำหรับแต่ละหมวดหมู่
     categories.forEach(category => {
       options[category] = new Set();
     });
 
-    // วนลูปการ์ดทุกใบเพื่อเติมค่าลงใน Set ที่ถูกต้อง
     cards.forEach(card => {
       categories.forEach(category => {
         const value = card[category];
         if (value !== '' && value !== undefined && value !== null) {
-          // ทำความสะอาดข้อมูล: แปลงเป็น String, ตัดเว้นวรรคหน้า-หลัง
           const cleanedValue = value.toString().trim();
           if (cleanedValue) {
-            options[category].add(cleanedValue);
+            // --- เพิ่มเงื่อนไขตรวจสอบ ---
+            if (category === 'Cost' || category === 'Gem') {
+              // ถ้าเป็นหมวด Cost หรือ Gem ต้องเป็นตัวเลขเท่านั้น
+              if (!isNaN(cleanedValue)) { // isNaN เช็คว่า "ไม่ใช่ตัวเลข" หรือไม่
+                options[category].add(cleanedValue);
+              }
+            } else {
+              // หมวดอื่นๆ เพิ่มได้ตามปกติ
+              options[category].add(cleanedValue);
+            }
+            // --- สิ้นสุดเงื่อนไข ---
           }
         }
       });
     });
-    
+
     // แปลง Set เป็น Array และเรียงข้อมูล
     return {
       Type: Array.from(options.Type).sort(),
@@ -89,27 +97,27 @@ function App() {
 
   const handleFilterChange = (category, value) => {
     setFilters(prevFilters => {
-      const currentValues = prevFilters[category];
-      if (currentValues.includes(value)) {
-        return { ...prevFilters, [category]: currentValues.filter(v => v !== value) };
-      } else {
-        return { ...prevFilters, [category]: [...currentValues, value] };
-      }
+      const currentValues = prevFilters[category] || []; // Ensure it's an array
+      return {
+        ...prevFilters,
+        [category]: currentValues.includes(value)
+          ? currentValues.filter(v => v !== value)
+          : [...currentValues, value]
+      };
     });
   };
 
   const filteredCards = useMemo(() => {
     return cards
-      .filter(card => 
+      .filter(card =>
         (card.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
          card.RuleName.toLowerCase().includes(searchTerm.toLowerCase()))
       )
       .filter(card => {
         return Object.entries(filters).every(([category, values]) => {
-          if (values.length === 0) {
+          if (!values || values.length === 0) {
             return true;
           }
-          // ตรวจสอบค่าที่ถูกทำความสะอาดแล้ว
           const cardValue = card[category]?.toString().trim();
           return values.includes(cardValue);
         });
@@ -215,14 +223,14 @@ function App() {
     }
     setLifeDeck(currentLifeDeck => [...currentLifeDeck, cardToAdd]);
   };
-  
+
   const removeCardFromMainDeck = (cardToRemove) => {
     setMainDeck(currentDeck => {
       const cardInDeck = currentDeck.find(card => card.RuleName === cardToRemove.RuleName);
       if (cardInDeck.count > 1) {
-        return currentDeck.map(card => 
-          card.RuleName === cardToRemove.RuleName 
-            ? { ...card, count: card.count - 1 } 
+        return currentDeck.map(card =>
+          card.RuleName === cardToRemove.RuleName
+            ? { ...card, count: card.count - 1 }
             : card
         );
       } else {
@@ -232,11 +240,11 @@ function App() {
   };
 
   const removeCardFromLifeDeck = (cardToRemove) => {
-    setLifeDeck(currentLifeDeck => 
+    setLifeDeck(currentLifeDeck =>
       currentLifeDeck.filter(card => card.RuleName !== cardToRemove.RuleName)
     );
   };
-  
+
   const clearAllDecks = () => {
     if (window.confirm("คุณต้องการล้างเด็คทั้งหมดใช่หรือไม่?")) {
       setMainDeck([]);
@@ -253,7 +261,7 @@ function App() {
     }
     html2canvas(element, {
       backgroundColor: '#1e1e1e',
-      useCORS: true 
+      useCORS: true
     }).then((canvas) => {
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
@@ -265,7 +273,7 @@ function App() {
 
   const handleExportTournamentPDF = async () => {
     if (deckName.trim() === '' || playerName.trim() === '') {
-      alert('กรุณากรอกชื่อเด็คและชื่อผู้เล่นก่อน Export PDF');
+      alert('กรุณากรอกชื่อเด็คและชื่อผู้เล่นก่อน Export');
       return;
     }
     if (mainDeckTotal !== MAIN_DECK_LIMIT || lifeDeck.length !== LIFE_DECK_LIMIT) {
@@ -280,14 +288,14 @@ function App() {
         mainDeck: mainDeck,
         lifeDeck: lifeDeck,
       };
-
-      const response = await axios.post('http://127.0.0.1:8000/api/generate-tournament-pdf', deckListData, {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
+      const response = await axios.post(`${apiUrl}/api/generate-tournament-pdf`, deckListData, {
         responseType: 'blob',
       });
-      
+
       const file = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const fileURL = URL.createObjectURL(file);
-      
+
       const link = document.createElement('a');
       link.href = fileURL;
       link.setAttribute('download', `decklist_${playerName.replace(/\s+/g, '_')}.xlsx`);
@@ -296,14 +304,14 @@ function App() {
       link.parentNode.removeChild(link);
 
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดในการ Export PDF:", error);
-      alert("ไม่สามารถสร้างไฟล์ PDF ได้ กรุณาตรวจสอบ Console");
+      console.error("เกิดข้อผิดพลาดในการ Export:", error);
+      alert("ไม่สามารถ Export ไฟล์ได้ กรุณาตรวจสอบ Console");
     }
   };
 
 
   const mainDeckTotal = mainDeck.reduce((total, card) => total + card.count, 0);
-  
+
   const getGroupedDeck = () => {
     return mainDeck.reduce((acc, card) => {
       let group = 'Other';
@@ -312,7 +320,7 @@ function App() {
       } else if (card.Type) {
         group = card.Type;
       }
-      
+
       if (!acc[group]) {
         acc[group] = [];
       }
@@ -348,26 +356,28 @@ function App() {
       </div>
     );
   };
-  
+
   return (
     <div className="app-container">
       <div className="main-content">
-        
+
         <div className={`filter-wrapper ${isFilterVisible ? 'visible' : 'hidden'}`}>
           <h2 className="filter-main-title">Filter Options</h2>
           <div className="filter-panel">
             {Object.entries(filterOptions).map(([category, options]) => (
-              <div key={category} className="filter-group">
-                <h3 className="filter-title">{category}</h3>
-                <div className="filter-options">
-                  {options.map(option => (
-                    <label key={option} className="filter-label">
-                      <input type="checkbox" checked={filters[category].includes(option)} onChange={() => handleFilterChange(category, option)} />
-                      {option}
-                    </label>
-                  ))}
+              options.length > 0 && (
+                <div key={category} className="filter-group">
+                  <h3 className="filter-title">{category.replace('_', ' ')}</h3>
+                  <div className="filter-options">
+                    {options.map(option => (
+                      <label key={option} className="filter-label">
+                        <input type="checkbox" checked={filters[category]?.includes(option)} onChange={() => handleFilterChange(category, option)} />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )
             ))}
           </div>
         </div>
@@ -395,11 +405,11 @@ function App() {
           <button className="decklist-toggle-btn" onClick={() => setIsDeckListVisible(!isDeckListVisible)}>
             {isDeckListVisible ? '❯' : '❮'}
           </button>
-          
+
           <div className="deck-list-content">
             <input type="text" className="deck-name-input" placeholder="กรอกชื่อเด็ค..." value={deckName} onChange={(e) => setDeckName(e.target.value)} />
             <input type="text" className="deck-name-input" placeholder="กรอกชื่อผู้เล่น..." value={playerName} onChange={(e) => setPlayerName(e.target.value)} />
-            
+
             <div className="deck-actions">
               <button onClick={clearAllDecks} className="clear-deck-btn">
                 Clear All 🗑️
@@ -408,11 +418,11 @@ function App() {
                 Export Image 📸
               </button>
             </div>
-            
+
             <div className="deck-actions">
-                <button onClick={handleExportTournamentPDF} className="export-pdf-btn">Export for Tournament 📜</button>
+                <button onClick={handleExportTournamentPDF} className="export-pdf-btn" >Export for Tournament 📜</button>
             </div>
-            
+
             <div className="deck-section">
               <div className="deck-header">Main Deck ({mainDeckTotal} / {MAIN_DECK_LIMIT})</div>
               <div className="deck-card-list">

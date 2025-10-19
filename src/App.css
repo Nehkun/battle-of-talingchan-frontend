@@ -403,3 +403,16 @@ body {
   color: #888;
   cursor: not-allowed;
 }
+.magic-type-filter-options {
+  margin-left: 25px; /* เยื้องเข้ามาด้านใน */
+  margin-top: 5px; /* ระยะห่างจาก checkbox Magic หลัก */
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.magic-type-label {
+  font-style: italic; /* ทำให้เป็นตัวเอียงเล็กน้อย (ถ้าต้องการ) */
+  color: #bbb; /* ทำให้สีจางลงเล็กน้อย */
+}
