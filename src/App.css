@@ -171,7 +171,7 @@ body {
   .deck-list-wrapper.visible { transform: translateX(0); }
 
   /* Adjust main content area */
-  .card-gallery-wrapper { padding-top: 80px; /* --- INCREASED PADDING TOP --- */ }
+  .card-gallery-wrapper { padding-top: 60px; /* --- INCREASED PADDING TOP --- */ }
 
   /* --- REVISED: Mobile Header Layout --- */
   .app-header {
