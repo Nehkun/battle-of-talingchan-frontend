@@ -172,6 +172,8 @@ body {
 
   /* Adjust main content area */
   .card-gallery-wrapper { padding-top: 50px; /* Reduced space for fixed header */ }
+
+  /* --- REVISED: Mobile Header Layout --- */
   .app-header {
     position: fixed; top: 0; left: 0; right: 0; z-index: 150;
     padding: 8px 12px; /* Keep padding */
@@ -195,6 +197,7 @@ body {
     margin-bottom: 8px; /* Adjust margin if needed */
   }
   .search-bar { width: 85%; margin-top: 8px; padding: 6px 8px; font-size: 0.8rem;}
+  /* --- End Revision --- */
 
   .close-sidebar-btn { top: 8px; right: 8px; font-size: 1.8rem;}
 
