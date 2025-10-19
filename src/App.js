@@ -136,6 +136,17 @@ function App() {
     const mainDeckTotal = mainDeck.reduce((total, card) => total + card.count, 0);
     const cardInDeck = mainDeck.find(card => card.RuleName === cardToAdd.RuleName);
     const currentCount = cardInDeck ? cardInDeck.count : 0;
+    if (mainDeckTotal === MAIN_DECK_LIMIT - 1) {
+        // เช็คว่าการ์ดที่จะเพิ่ม ไม่ใช่ Only#1
+        if (!cardToAdd.is_only_one) {
+            // เช็คว่าในเด็ค 49 ใบนั้น ยังไม่มี Only#1 อยู่เลย
+            const hasOnlyOneAlready = mainDeck.some(card => card.is_only_one);
+            if (!hasOnlyOneAlready) {
+                alert(`เด็คของคุณยังขาดการ์ด Only#1! การ์ดใบสุดท้าย (ใบที่ 50) ต้องเป็นการ์ด Only#1 เท่านั้น`);
+                return; // หยุดการทำงาน
+            }
+        }
+    }
     if (mainDeckTotal >= MAIN_DECK_LIMIT) {
       alert("Main Deck ของคุณเต็มแล้ว (50 ใบ)"); return;
     }
