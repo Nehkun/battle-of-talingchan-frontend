@@ -18,144 +18,104 @@ body {
 
 /* --- App Layout --- */
 .app-container {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-  background-color: rgba(18, 18, 18, 0.7); /* Dark overlay */
+  display: flex; height: 100vh; overflow: hidden; background-color: rgba(18, 18, 18, 0.7);
+  position: relative; /* Needed for fixed popups */
 }
-.main-content {
-  display: flex;
-  width: 100%;
-  position: relative; /* Needed for absolute positioning on mobile */
-}
+.main-content { display: flex; width: 100%; }
 
-/* --- Columns --- */
+/* --- Sidebar Styles (Popup/Overlay) --- */
+.filter-wrapper, .deck-list-wrapper {
+  position: fixed; /* Fixed position relative to viewport */
+  top: 0; bottom: 0; height: 100vh; /* Full height */
+  width: 90%; /* Adjust width as needed */ max-width: 350px; /* Max width */
+  background-color: #1e1e1e;
+  padding: 24px; padding-top: 60px; /* Add padding for close button */
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  overflow-y: auto;
+  z-index: 300; /* High z-index */
+  transition: transform 0.3s ease-in-out, visibility 0.3s;
+  visibility: hidden; /* Hidden by default */
+}
 .filter-wrapper {
-  flex: 0 0 250px; /* Fixed width */
-  background-color: #1e1e1e; /* Dark grey */
-  border-right: 1px solid #333;
-  overflow-y: auto;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease-in-out; /* Use transform for sliding */
-  transform: translateX(0);
-  z-index: 200;
-}
-.filter-wrapper.hidden {
-  transform: translateX(-100%); /* Slide left */
-}
-.card-gallery-wrapper {
-  flex: 1; /* Takes remaining space */
-  overflow-y: auto;
-  background-color: transparent; /* Show body background */
-  display: flex;
-  flex-direction: column;
+  left: 0; transform: translateX(-100%); border-right: 1px solid #333;
 }
 .deck-list-wrapper {
-  flex: 0 0 350px; /* Fixed width */
-  background-color: #1e1e1e; /* Dark grey */
-  padding: 24px;
-  border-left: 1px solid #333;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  position: relative; /* Keep relative for inner absolute button */
-  transition: transform 0.3s ease-in-out; /* Use transform for sliding */
-  transform: translateX(0);
-  z-index: 200;
+  right: 0; transform: translateX(100%); border-left: 1px solid #333;
 }
-.deck-list-wrapper.hidden {
-  transform: translateX(100%); /* Slide right */
+.filter-wrapper.visible, .deck-list-wrapper.visible {
+  transform: translateX(0);
+  visibility: visible; /* Make visible when class is added */
+}
+
+/* --- Backdrop Overlay --- */
+.backdrop {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 299; /* Below sidebars but above content */
+  cursor: pointer;
+}
+
+/* --- Card Gallery --- */
+.card-gallery-wrapper {
+  flex: 1; overflow-y: auto; background-color: transparent; display: flex; flex-direction: column;
 }
 
 /* --- Header & Search Bar --- */
 .app-header {
-  background-color: rgba(30, 30, 30, 0.8); /* Translucent dark grey */
-  backdrop-filter: blur(5px); /* Frosted glass effect */
-  padding: 16px 24px;
-  text-align: center;
-  border-bottom: 1px solid #333;
-  position: relative; /* For toggle button positioning */
+  background-color: rgba(30, 30, 30, 0.8); backdrop-filter: blur(5px); padding: 10px 16px; /* Reduced padding */ text-align: center; border-bottom: 1px solid #333; position: relative; z-index: 150; /* Ensure header is above gallery but below popups */
 }
-.app-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #ffffff; /* White title */
+/* --- Header Button Container --- */
+.header-buttons {
+  position: absolute; /* Position buttons within header */
+  top: 50%;
+  left: 16px;
+  right: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between; /* Space out buttons */
+  pointer-events: none; /* Allow clicks through container */
 }
-.search-bar {
-  width: 95%;
-  max-width: 400px; /* Limit width on large screens */
-  padding: 12px 15px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: 1px solid #555;
-  background-color: #333;
-  color: #e0e0e0;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  margin-top: 16px;
+.toggle-button {
+  background-color: #007bff; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 0.9rem; font-family: 'Kanit', sans-serif; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.4); transition: background-color 0.2s;
+  pointer-events: auto; /* Make buttons clickable */
 }
-.search-bar:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
+.toggle-button:hover { background-color: #0056b3; }
+.header-buttons button:last-child { background-color: #28a745; } /* Style Deck List button differently */
+.header-buttons button:last-child:hover { background-color: #218838; }
+
+.app-header h1 { margin: 0; font-size: 1.5rem; color: #ffffff; }
+.search-bar { width: 90%; max-width: 350px; padding: 8px 10px; font-size: 0.9rem; border-radius: 8px; border: 1px solid #555; background-color: #333; color: #e0e0e0; transition: border-color 0.2s, box-shadow 0.2s; margin-top: 10px; }
+.search-bar:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
 .search-bar::placeholder { color: #888; }
 
-/* --- Toggle Buttons --- */
-.filter-toggle-btn { /* Keep filter button fixed on screen */
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  background-color: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  z-index: 202; /* INCREASED Z-INDEX */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background-color 0.2s;
+/* --- Close Button Style --- */
+.close-sidebar-btn {
+  position: absolute; top: 10px; right: 10px;
+  background: none; border: none; color: #aaa; font-size: 2rem; font-weight: bold; cursor: pointer; line-height: 1; padding: 5px;
 }
-.filter-toggle-btn:hover { background-color: #0056b3; }
+.close-sidebar-btn:hover { color: #fff; }
 
-/* --- Deck List Toggle Button (Desktop) --- */
-.decklist-toggle-btn {
-  position: absolute; /* Position relative to deck-list-wrapper */
-  top: 16px;          /* Distance from top edge of sidebar */
-  left: 16px;         /* Distance from left edge of sidebar */
-  right: auto;        /* Remove right positioning */
-  background-color: #28a745;
-  color: white;
-  border: 2px solid red; /* Added red border */
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 101; /* Needs to be above content within the sidebar */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: background-color 0.2s;
-}
-.decklist-toggle-btn:hover { background-color: #218838; }
 
-/* --- Filter Panel --- */
-.filter-main-title { font-size: 1.5rem; margin: 0 0 16px 0; color: #007bff; }
-.filter-panel { display: flex; flex-direction: column; gap: 20px; }
+/* --- Filter Panel Inner Styles --- */
+.filter-main-title { font-size: 1.2rem; margin: 0 0 16px 0; color: #007bff; }
+.filter-panel { display: flex; flex-direction: column; gap: 16px; }
 .filter-group { display: flex; flex-direction: column; }
 .filter-title { font-size: 1rem; font-weight: 700; margin: 0 0 8px 0; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 4px; }
 .filter-options { display: flex; flex-direction: column; gap: 8px; }
 .filter-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; }
 .filter-label input[type="checkbox"] { cursor: pointer; }
-.magic-type-filter-options {
-  margin-left: 25px; margin-top: 5px; margin-bottom: 5px; display: flex; flex-direction: column; gap: 6px;
-}
+.magic-type-filter-options { margin-left: 25px; margin-top: 5px; margin-bottom: 5px; display: flex; flex-direction: column; gap: 6px; }
 .magic-type-label { font-style: italic; color: #bbb; }
 
-/* --- Card Gallery --- */
-.card-gallery { padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; flex-grow: 1; }
+
+/* --- Card Gallery Inner Styles --- */
+.card-gallery { padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; flex-grow: 1; }
 .card-container { width: 100%; cursor: pointer; }
 .card-image { width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; display: block; }
 .card-image:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
 
-/* --- Deck List & Card Items --- */
+
+/* --- Deck List Inner Styles --- */
 .deck-list-content { display: flex; flex-direction: column; flex-grow: 1; }
 .deck-name-input { width: 95%; padding: 10px 12px; font-size: 1.1rem; font-family: 'Kanit', sans-serif; border-radius: 8px; border: 1px solid #555; background-color: #333; color: #e0e0e0; margin-bottom: 16px; text-align: center; }
 .deck-name-input::placeholder { color: #888; }
@@ -180,6 +140,8 @@ body {
 .delete-card-btn:hover { color: #dc3545; transform: scale(1.1); }
 .deck-card-group { margin-bottom: 1rem; }
 .group-header { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #aaa; margin: 0 0 0.5rem 0; padding-left: 0.25rem; }
+.hide-on-print { display: inline-block; } /* Make sure delete button is visible normally */
+
 
 /* --- Printable Area Styles --- */
 .printable-area-container {
@@ -192,14 +154,16 @@ body {
 .printable-area-container .deck-card-item { padding: 10px 12px; }
 .printable-area-container .deck-card-thumbnail { width: 40px; height: 40px; }
 .printable-area-container .deck-card-name { font-size: 1rem; }
+/* Hide elements not needed in print */
+.printable-area-container .hide-on-print { display: none !important; }
 
 /* --- 📱 MEDIA QUERY FOR MOBILE DEVICES 📱 --- */
 @media (max-width: 768px) {
   /* Sidebars cover screen on mobile */
   .filter-wrapper, .deck-list-wrapper {
-    position: absolute;
+    position: fixed; /* Changed back to fixed for overlay effect */
     top: 0; bottom: 0; height: 100%; width: 85%; /* Slightly wider */ max-width: 320px; /* Increase max width */ box-shadow: 0 0 15px rgba(0,0,0,0.5); border: none;
-    padding-top: 60px; /* Add space for fixed header/buttons */
+    padding-top: 50px; /* Adjust space for close button */
   }
   .filter-wrapper { left: 0; transform: translateX(-100%); }
   .filter-wrapper.visible { transform: translateX(0); }
@@ -207,46 +171,22 @@ body {
   .deck-list-wrapper.visible { transform: translateX(0); }
 
   /* Adjust main content area */
-  .card-gallery-wrapper { padding-top: 60px; /* Space for fixed header */ }
+  .card-gallery-wrapper { padding-top: 50px; /* Reduced space for fixed header */ }
   .app-header {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 150; padding: 10px 16px; /* Adjust padding */
+    position: fixed; top: 0; left: 0; right: 0; z-index: 150; padding: 8px 12px; /* Adjust padding */
   }
-  .app-header h1 { font-size: 1.3rem; margin-bottom: 8px;} /* Adjust title */
-  .search-bar { width: 90%; margin-top: 8px; padding: 8px 10px; font-size: 0.9rem;}
+  .header-buttons { top: 12px; left: 10px; right: 10px; transform: none; } /* Adjust button container positioning */
+  .toggle-button { padding: 4px 8px; font-size: 0.8rem; }
+  .app-header h1 { font-size: 1.1rem; margin-top: 40px; } /* Push title below buttons */
+  .search-bar { width: 85%; margin-top: 8px; padding: 6px 8px; font-size: 0.8rem;}
 
-  /* Adjust toggle button positions */
-  .filter-toggle-btn { /* Filter button remains fixed */
-      position: fixed;
-      top: 12px;
-      left: 12px;
-  }
-  /* --- REVISED: Deck List Button Fixed on Mobile --- */
-  .decklist-toggle-btn {
-      position: fixed; /* Ensure it stays on screen */
-      top: 12px;
-      right: 12px; /* Position to the top-right */
-      left: auto;   /* Remove absolute positioning relative to sidebar */
-      /* Keep visual styles */
-       background-color: #28a745;
-       color: white;
-       border: 2px solid red; /* Keep red border if desired */
-       border-radius: 50%;
-       width: 40px;
-       height: 40px;
-       font-size: 1.5rem;
-       cursor: pointer;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       z-index: 202; /* Ensure it's on top */
-       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-       transition: background-color 0.2s;
-  }
+  .close-sidebar-btn { top: 8px; right: 8px; font-size: 1.8rem;}
+
 
   /* Smaller cards on mobile */
   .card-gallery {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Further reduced card size */
-    padding: 12px 8px; gap: 8px; /* Reduce padding/gap */
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Further reduced card size */
+    padding: 10px 6px; gap: 6px; /* Reduce padding/gap */
   }
 
   /* Adjust deck list elements for mobile */
