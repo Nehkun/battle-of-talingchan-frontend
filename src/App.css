@@ -60,7 +60,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  position: relative;
+  position: relative; /* Keep relative for inner absolute button */
   transition: transform 0.3s ease-in-out; /* Use transform for sliding */
   transform: translateX(0);
   z-index: 200;
@@ -103,23 +103,23 @@ body {
 .search-bar::placeholder { color: #888; }
 
 /* --- Toggle Buttons --- */
-.filter-toggle-btn, .decklist-toggle-btn {
-  position: fixed; /* Keep buttons in view */
+.filter-toggle-btn { /* Keep filter button fixed on screen */
+  position: fixed;
   top: 10px;
-  background-color: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 201; /* Above sidebars */ box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background-color 0.2s;
+  left: 10px;
+  background-color: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 201; box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background-color 0.2s;
 }
-.filter-toggle-btn { left: 10px; } /* Position filter button */
 .filter-toggle-btn:hover { background-color: #0056b3; }
+
+/* --- REVISED: Deck List Toggle Button --- */
 .decklist-toggle-btn {
-  position: absolute; /* เปลี่ยนกลับเป็น absolute */
-  top: 16px;
-  /* --- REVISED: ย้ายปุ่มมาติดขอบซ้ายของ Sidebar --- */
-  left: -20px; /* ทำให้ปุ่มยื่นออกมาทางซ้ายจากขอบของ Sidebar */
-  right: auto; /* ลบการกำหนดตำแหน่งชิดขวา */
-  /* --- End Revision --- */
+  position: absolute; /* Position relative to deck-list-wrapper */
+  top: 16px;          /* Distance from top edge of sidebar */
+  left: 16px;         /* Distance from left edge of sidebar */
+  right: auto;        /* Remove right positioning */
   background-color: #28a745;
   color: white;
-  border: none;
+  border: 2px solid red; /* Added red border */
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -128,7 +128,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 101; /* ปรับ z-index ตามความเหมาะสม */
+  z-index: 101; /* Needs to be above content within the sidebar */
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   transition: background-color 0.2s;
 }
@@ -213,9 +213,17 @@ body {
   .search-bar { width: 90%; margin-top: 8px; padding: 8px 10px; font-size: 0.9rem;}
 
   /* Adjust toggle button positions slightly */
-  .filter-toggle-btn, .decklist-toggle-btn { top: 12px; }
-  .filter-toggle-btn { left: 12px; }
-  .decklist-toggle-btn { right: 12px; }
+  .filter-toggle-btn { /* Filter button remains fixed */
+      position: fixed;
+      top: 12px;
+      left: 12px;
+  }
+  .decklist-toggle-btn { /* Deck list button becomes fixed too */
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      left: auto; /* Remove absolute positioning relative to sidebar */
+  }
 
   /* Smaller cards on mobile */
   .card-gallery {
