@@ -218,12 +218,6 @@ body {
       top: 12px;
       left: 12px;
   }
-  .decklist-toggle-btn { /* Deck list button becomes fixed too */
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      left: auto; /* Remove absolute positioning relative to sidebar */
-  }
 
   /* Smaller cards on mobile */
   .card-gallery {
