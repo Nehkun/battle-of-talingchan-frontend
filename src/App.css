@@ -64,7 +64,7 @@ body {
 .app-header {
   background-color: rgba(30, 30, 30, 0.8); backdrop-filter: blur(5px); padding: 10px 16px; /* Reduced padding */ text-align: center; border-bottom: 1px solid #333; position: relative; z-index: 150; /* Ensure header is above gallery but below popups */
 }
-/* --- Header Button Container (Desktop) --- */
+/* --- Header Button Container --- */
 .header-buttons {
   position: absolute; /* Position buttons within header */
   top: 50%;
@@ -141,6 +141,14 @@ body {
 .deck-card-group { margin-bottom: 1rem; }
 .group-header { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #aaa; margin: 0 0 0.5rem 0; padding-left: 0.25rem; }
 .hide-on-print { display: inline-block; } /* Make sure delete button is visible normally */
+.save-deck-btn, .load-deck-btn {
+  flex: 1; padding: 10px 15px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; font-family: 'Kanit', sans-serif;
+}
+.save-deck-btn { color: #fff; background-color: #17a2b8; border: 1px solid #117a8b; }
+.save-deck-btn:hover { background-color: #117a8b; }
+.load-deck-btn { color: #fff; background-color: #ffc107; border: 1px solid #d39e00; }
+.load-deck-btn:hover { background-color: #d39e00; }
+.button-row { display: flex; gap: 10px; margin-bottom: 10px; }
 
 
 /* --- Printable Area Styles --- */
@@ -154,7 +162,6 @@ body {
 .printable-area-container .deck-card-item { padding: 10px 12px; }
 .printable-area-container .deck-card-thumbnail { width: 40px; height: 40px; }
 .printable-area-container .deck-card-name { font-size: 1rem; }
-/* Hide elements not needed in print */
 .printable-area-container .hide-on-print { display: none !important; }
 
 /* --- 📱 MEDIA QUERY FOR MOBILE DEVICES 📱 --- */
@@ -171,7 +178,7 @@ body {
   .deck-list-wrapper.visible { transform: translateX(0); }
 
   /* Adjust main content area */
-  .card-gallery-wrapper { padding-top: 120px; /* --- INCREASED PADDING TOP --- */ }
+  .card-gallery-wrapper { padding-top: 80px; /* --- INCREASED PADDING TOP --- */ }
 
   /* --- REVISED: Mobile Header Layout --- */
   .app-header {
@@ -219,8 +226,17 @@ body {
 
   /* Adjust deck list elements for mobile */
   .deck-name-input { width: 85%; font-size: 1rem; padding: 6px 8px; margin-bottom: 10px;}
-  .deck-actions { flex-direction: column; gap: 6px; margin-bottom: 6px;} /* Stack buttons */
-  .clear-deck-btn, .export-image-btn, .export-pdf-btn { font-size: 0.8rem; padding: 6px 8px;}
+  /* --- REVISED: Keep button rows on mobile --- */
+  .deck-actions {
+     flex-direction: row; /* Keep buttons side-by-side */
+     gap: 6px;
+     margin-bottom: 6px;
+  }
+  .clear-deck-btn, .export-image-btn, .export-pdf-btn, .save-deck-btn, .load-deck-btn {
+      font-size: 0.8rem;
+      padding: 6px 8px;
+  }
+  /* --- End Revision --- */
   .deck-header { font-size: 1rem; margin-bottom: 6px; padding-bottom: 4px; }
   .deck-card-list { gap: 4px; }
   .deck-card-item { padding: 4px 6px; border-left-width: 3px; }

@@ -20,10 +20,10 @@ function App() {
   const [deckName, setDeckName] = useState('');
   const [playerName, setPlayerName] = useState('');
   const deckListRef = useRef(null);
+  const fileInputRef = useRef(null); // Ref for hidden file input
   const [filters, setFilters] = useState({
     Type: [], Symbol: [], Cost: [], 'C Color': [], Gem: [], 'G Color': [],
   });
-  // Note: Magic Type filter state was removed based on previous iterations, keeping it simple.
 
   // --- Fetch Cards Effect ---
   useEffect(() => {
@@ -106,12 +106,10 @@ function App() {
   const addCardToDeck = (cardToAdd) => {
     const isLifeCard = cardToAdd.Name.includes('_Life') || cardToAdd.RuleName.includes('_Life');
     if (isLifeCard) {
-      // Automatically add to life deck if it's a life card and clicked left
-      addCardToLifeDeck(cardToAdd);
+      addCardToLifeDeck(cardToAdd); // Automatically add to life deck
       return;
     }
 
-    // Mear Pra Iswuan Check
     const MEAR_PRA_ISUAN_RULENAME = 'เมียพระอิศวร';
     const THEP_SYMBOL = 'เทพ';
     const AVATAR_TYPE = 'Avatar';
@@ -120,36 +118,34 @@ function App() {
         deckCard => deckCard.Type === AVATAR_TYPE && deckCard.Symbol !== THEP_SYMBOL
       );
       if (hasNonThepAvatar) {
-        alert("ไม่สามารถเพิ่ม 'เมียพระอิศวร' ได้ เพราะในเด็คมี Avatar ที่ Symbol ไม่ใช่ 'เทพ' อยู่แล้ว");
-        return;
+        alert("ไม่สามารถเพิ่ม 'เมียพระอิศวร' ได้ เพราะในเด็คมี Avatar ที่ Symbol ไม่ใช่ 'เทพ' อยู่แล้ว"); return;
       }
     }
     const deckHasMearPraIsuan = mainDeck.some(deckCard => deckCard.RuleName === MEAR_PRA_ISUAN_RULENAME);
     if (deckHasMearPraIsuan && cardToAdd.Type === AVATAR_TYPE) {
       if (cardToAdd.Symbol !== THEP_SYMBOL) {
-        alert("เด็คที่มี 'เมียพระอิศวร' สามารถเพิ่มได้เฉพาะ Avatar ที่มี Symbol 'เทพ' เท่านั้น");
-        return;
+        alert("เด็คที่มี 'เมียพระอิศวร' สามารถเพิ่มได้เฉพาะ Avatar ที่มี Symbol 'เทพ' เท่านั้น"); return;
       }
     }
 
-    // Standard Checks
     const mainDeckTotal = mainDeck.reduce((total, card) => total + card.count, 0);
-    const cardInDeck = mainDeck.find(card => card.RuleName === cardToAdd.RuleName);
-    const currentCount = cardInDeck ? cardInDeck.count : 0;
+    // Only#1 Final Card Check
     if (mainDeckTotal === MAIN_DECK_LIMIT - 1) {
-        // เช็คว่าการ์ดที่จะเพิ่ม ไม่ใช่ Only#1
         if (!cardToAdd.is_only_one) {
-            // เช็คว่าในเด็ค 49 ใบนั้น ยังไม่มี Only#1 อยู่เลย
             const hasOnlyOneAlready = mainDeck.some(card => card.is_only_one);
             if (!hasOnlyOneAlready) {
-                alert(`เด็คของคุณยังขาดการ์ด Only#1! การ์ดใบสุดท้าย (ใบที่ 50) ต้องเป็นการ์ด Only#1 เท่านั้น`);
-                return; // หยุดการทำงาน
+                alert(`เด็คของคุณยังขาดการ์ด Only#1! การ์ดใบสุดท้าย (ใบที่ 50) ต้องเป็นการ์ด Only#1 เท่านั้น`); return;
             }
         }
     }
+    // Deck Limit Check
     if (mainDeckTotal >= MAIN_DECK_LIMIT) {
       alert("Main Deck ของคุณเต็มแล้ว (50 ใบ)"); return;
     }
+
+    // Other Checks (Banlist, Count Limit, Only#1 existing, Group Conflict)
+    const cardInDeck = mainDeck.find(card => card.RuleName === cardToAdd.RuleName);
+    const currentCount = cardInDeck ? cardInDeck.count : 0;
     const limit = cardToAdd.AllowedCopies !== null ? cardToAdd.AllowedCopies : DEFAULT_CARD_LIMIT;
     if (limit === 0) {
       alert(`การ์ด "${cardToAdd.Name}" ถูกแบน ห้ามใส่ในเด็ค`); return;
@@ -159,7 +155,7 @@ function App() {
     }
     if (cardToAdd.is_only_one) {
       const hasOnlyOneCard = mainDeck.some(card => card.is_only_one);
-      if (hasOnlyOneCard) {
+      if (hasOnlyOneCard && !cardInDeck) { // Allow increasing count if already in deck
         alert("คุณสามารถใส่การ์ดประเภท Only#1 ได้เพียงใบเดียวในเด็ค"); return;
       }
     }
@@ -171,39 +167,40 @@ function App() {
         );
         if (hasConflict) {
             if (groupType === 'Choice' || groupType === 'Incompatible') {
-                alert(`ไม่สามารถเพิ่ม "${cardToAdd.Name}" ได้ เพราะมีการ์ดอื่นจากกลุ่ม (${groupID}) อยู่ในเด็คแล้ว`);
-                return;
+                alert(`ไม่สามารถเพิ่ม "${cardToAdd.Name}" ได้ เพราะมีการ์ดอื่นจากกลุ่ม (${groupID}) อยู่ในเด็คแล้ว`); return;
             }
         }
     }
 
     // Add/Update Card
     setMainDeck(currentDeck => {
-      const sortedDeck = [...currentDeck];
-      const existingCardIndex = sortedDeck.findIndex(card => card.RuleName === cardToAdd.RuleName);
+      const updatedDeck = [...currentDeck];
+      const existingCardIndex = updatedDeck.findIndex(card => card.RuleName === cardToAdd.RuleName);
       if (existingCardIndex > -1) {
-        sortedDeck[existingCardIndex].count++;
+        updatedDeck[existingCardIndex] = { ...updatedDeck[existingCardIndex], count: updatedDeck[existingCardIndex].count + 1 };
       } else {
-        sortedDeck.push({ ...cardToAdd, count: 1 });
+        updatedDeck.push({ ...cardToAdd, count: 1 });
       }
-      sortedDeck.sort((a, b) => {
-        const typeOrder = ['Only#1', 'Avatar', 'Magic', 'Construct']; // Define sort order
-        const typeAIndex = typeOrder.indexOf(a.is_only_one ? 'Only#1' : a.Type);
-        const typeBIndex = typeOrder.indexOf(b.is_only_one ? 'Only#1' : b.Type);
+      // Sort after adding/updating
+      updatedDeck.sort((a, b) => {
+        const typeOrder = ['Only#1', 'Avatar', 'Magic', 'Construct', 'Other']; // Ensure 'Other' is included
+        const aGroup = a.is_only_one ? 'Only#1' : (a.Type || 'Other');
+        const bGroup = b.is_only_one ? 'Only#1' : (b.Type || 'Other');
+        const typeAIndex = typeOrder.indexOf(aGroup);
+        const typeBIndex = typeOrder.indexOf(bGroup);
         if (typeAIndex !== typeBIndex) return typeAIndex - typeBIndex;
         if (a.Name < b.Name) return -1;
         if (a.Name > b.Name) return 1;
         return 0;
       });
-      return sortedDeck;
+      return updatedDeck;
     });
   };
 
   const addCardToLifeDeck = (cardToAdd) => {
     const isLifeCard = cardToAdd.Name.includes('_Life') || cardToAdd.RuleName.includes('_Life');
     if (!isLifeCard) {
-      alert(`การ์ด "${cardToAdd.Name}" ไม่ใช่ Life Card จึงไม่สามารถเพิ่มลงใน Life Deck ได้`);
-      return;
+      alert(`การ์ด "${cardToAdd.Name}" ไม่ใช่ Life Card จึงไม่สามารถเพิ่มลงใน Life Deck ได้`); return;
     }
     if (lifeDeck.length >= LIFE_DECK_LIMIT) {
       alert("Life Deck ของคุณเต็มแล้ว (5 ใบ)"); return;
@@ -218,7 +215,7 @@ function App() {
   const removeCardFromMainDeck = (cardToRemove) => {
     setMainDeck(currentDeck => {
       const cardInDeck = currentDeck.find(card => card.RuleName === cardToRemove.RuleName);
-      if (!cardInDeck) return currentDeck; // Should not happen, but safe check
+      if (!cardInDeck) return currentDeck;
       if (cardInDeck.count > 1) {
         return currentDeck.map(card =>
           card.RuleName === cardToRemove.RuleName
@@ -262,7 +259,7 @@ function App() {
     if (deckName.trim() === '' || playerName.trim() === '') {
       alert('กรุณากรอกชื่อเด็คและชื่อผู้เล่นก่อน Export'); return;
     }
-    const mainDeckTotalCheck = mainDeck.reduce((total, card) => total + card.count, 0); // Recalculate here
+    const mainDeckTotalCheck = mainDeck.reduce((total, card) => total + card.count, 0);
     if (mainDeckTotalCheck !== MAIN_DECK_LIMIT || lifeDeck.length !== LIFE_DECK_LIMIT) {
       alert(`เด็คยังไม่สมบูรณ์! Main Deck ต้องมี ${MAIN_DECK_LIMIT} ใบ และ Life Deck ต้องมี ${LIFE_DECK_LIMIT} ใบ`); return;
     }
@@ -284,10 +281,49 @@ function App() {
     }
   };
 
+  // --- Save/Load Deck Functions ---
+  const handleSaveDeck = () => {
+    if (!deckName.trim()) { alert("Please enter a deck name before saving."); return; }
+    const deckData = { deckName, playerName, mainDeck, lifeDeck };
+    const jsonString = JSON.stringify(deckData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${deckName.replace(/\s+/g, '_') || 'talingchan_deck'}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  const triggerLoadDeck = () => { fileInputRef.current.click(); };
+  const handleLoadDeckFile = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const loadedData = JSON.parse(e.target.result);
+        if ( typeof loadedData.deckName === 'string' && typeof loadedData.playerName === 'string' &&
+             Array.isArray(loadedData.mainDeck) && Array.isArray(loadedData.lifeDeck) )
+        {
+          setDeckName(loadedData.deckName);
+          setPlayerName(loadedData.playerName);
+          setMainDeck(loadedData.mainDeck);
+          setLifeDeck(loadedData.lifeDeck);
+          alert(`Deck "${loadedData.deckName}" loaded successfully!`);
+        } else { throw new Error("Invalid deck file structure."); }
+      } catch (error) {
+        console.error("Error loading deck file:", error);
+        alert("Failed to load deck file. Ensure it's a valid JSON deck file.");
+      } finally { event.target.value = null; }
+    };
+    reader.onerror = (e) => { console.error("Error reading file:", e); alert("Error reading the selected file."); event.target.value = null; };
+    reader.readAsText(file);
+  };
+
 
   // --- Deck Rendering Logic ---
   const mainDeckTotal = mainDeck.reduce((total, card) => total + card.count, 0);
-  const getGroupedDeck = () => { /* ... unchanged ... */
+  const getGroupedDeck = () => {
     return mainDeck.reduce((acc, card) => {
       let group = 'Other';
       if (card.is_only_one) { group = 'Only#1'; }
@@ -296,7 +332,7 @@ function App() {
       acc[group].push(card);
       return acc;
     }, {});
-  };
+   };
   const groupedDeckData = getGroupedDeck();
   const groupOrder = ['Only#1', 'Avatar', 'Magic', 'Construct']; // Define group display order
 
@@ -308,12 +344,12 @@ function App() {
       <div key={groupName} className="deck-card-group">
         <h4 className="group-header">{groupName} ({groupTotal})</h4>
         {groupCards.map((card, index) => (
-          <div key={`${card.RuleName}-${index}`} className="deck-card-item">
+          <div key={`${card.RuleName}-${index}-${card.count}`} className="deck-card-item"> {/* Improved key */}
             {card.image_url && <img src={card.image_url} alt={card.Name} className="deck-card-thumbnail" />}
             <span className="deck-card-count">x{card.count}</span>
             <span className="deck-card-name">{card.Name}</span>
             {!isPrintable && (
-              <button onClick={() => removeCardFromMainDeck(card)} className="delete-card-btn hide-on-print"> {/* Added hide-on-print */}
+              <button onClick={() => removeCardFromMainDeck(card)} className="delete-card-btn hide-on-print">
                 🗑️
               </button>
             )}
@@ -323,13 +359,11 @@ function App() {
     );
   };
 
+  // --- Component Return ---
   return (
     <div className="app-container">
-      {/* --- Backdrop --- */}
       {(isFilterVisible || isDeckListVisible) && <div className="backdrop" onClick={() => { setIsFilterVisible(false); setIsDeckListVisible(false); }}></div>}
-
       <div className="main-content">
-        {/* --- Filter Sidebar --- */}
         <div className={`filter-wrapper ${isFilterVisible ? 'visible' : 'hidden'}`}>
             <button className="close-sidebar-btn" onClick={() => setIsFilterVisible(false)}>×</button>
             <h2 className="filter-main-title">Filter Options</h2>
@@ -352,7 +386,6 @@ function App() {
           </div>
         </div>
 
-        {/* --- Card Gallery --- */}
         <div className="card-gallery-wrapper">
           <header className="app-header">
              <div className="header-buttons">
@@ -373,18 +406,22 @@ function App() {
           </main>
         </div>
 
-        {/* --- Deck List Sidebar --- */}
         <div className={`deck-list-wrapper ${isDeckListVisible ? 'visible' : 'hidden'}`}>
             <button className="close-sidebar-btn" onClick={() => setIsDeckListVisible(false)}>×</button>
             <div className="deck-list-content">
               <input type="text" className="deck-name-input" placeholder="กรอกชื่อเด็ค..." value={deckName} onChange={(e) => setDeckName(e.target.value)} />
               <input type="text" className="deck-name-input" placeholder="กรอกชื่อผู้เล่น..." value={playerName} onChange={(e) => setPlayerName(e.target.value)} />
-              <div className="deck-actions">
+              <div className="deck-actions button-row">
+                <button onClick={handleSaveDeck} className="save-deck-btn">Save Deck 💾</button>
+                <button onClick={triggerLoadDeck} className="load-deck-btn">Load Deck 📂</button>
+              </div>
+              <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".json" onChange={handleLoadDeckFile} />
+              <div className="deck-actions button-row">
                 <button onClick={clearAllDecks} className="clear-deck-btn">Clear All 🗑️</button>
                 <button onClick={handleExportImage} className="export-image-btn">Export Image 📸</button>
               </div>
-              <div className="deck-actions">
-                  <button onClick={handleExportTournamentExcel} className="export-pdf-btn">Export for Tournament 📜</button> {/* Changed name for clarity */}
+              <div className="deck-actions button-row">
+                  <button onClick={handleExportTournamentExcel} className="export-pdf-btn">Export for Tournament 📜</button>
               </div>
               <div className="deck-section">
                 <div className="deck-header">Main Deck ({mainDeckTotal} / {MAIN_DECK_LIMIT})</div>
@@ -400,7 +437,7 @@ function App() {
                       {card.image_url && <img src={card.image_url} alt={card.Name} className="deck-card-thumbnail" />}
                       <span className="deck-card-count">x1</span>
                       <span className="deck-card-name">{card.Name}</span>
-                      <button onClick={() => removeCardFromLifeDeck(card)} className="delete-card-btn hide-on-print">🗑️</button> {/* Added hide-on-print */}
+                      <button onClick={() => removeCardFromLifeDeck(card)} className="delete-card-btn hide-on-print">🗑️</button>
                     </div>
                   ))}
                 </div>
@@ -409,28 +446,18 @@ function App() {
         </div>
       </div>
 
-      {/* --- Printable Area --- */}
       <div className="printable-area-container" ref={deckListRef}>
-        <div className="printable-header">
-          <h2>{deckName || 'Deck List'}</h2>
-        </div>
+        <div className="printable-header"> <h2>{deckName || 'Deck List'}</h2> </div>
         <div className="printable-content-grid">
-          <div className="printable-group-column">
-            {renderCardGroup('Only#1', true)}
-            {renderCardGroup('Avatar', true)}
-          </div>
-          <div className="printable-group-column">
-            {renderCardGroup('Magic', true)}
-            {renderCardGroup('Construct', true)}
-          </div>
+          <div className="printable-group-column"> {renderCardGroup('Only#1', true)} {renderCardGroup('Avatar', true)} </div>
+          <div className="printable-group-column"> {renderCardGroup('Magic', true)} {renderCardGroup('Construct', true)} </div>
           <div className="printable-group-column">
             <div className="deck-card-group">
                 <h4 className="group-header">Life Deck ({lifeDeck.length})</h4>
                 {lifeDeck.map((card, index) => (
                   <div key={`${card.RuleName}-${index}`} className="deck-card-item">
                     {card.image_url && <img src={card.image_url} alt={card.Name} className="deck-card-thumbnail" />}
-                    <span className="deck-card-count">x1</span>
-                    <span className="deck-card-name">{card.Name}</span>
+                    <span className="deck-card-count">x1</span> <span className="deck-card-name">{card.Name}</span>
                   </div>
                 ))}
             </div>
